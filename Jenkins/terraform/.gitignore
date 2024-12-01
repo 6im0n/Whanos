@@ -1,0 +1,5 @@
+# Ignore all
+terraform.tfvars
+terraform.tfstate
+terraform.tfstate.backup
+whanos-id.json
