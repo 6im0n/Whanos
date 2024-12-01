@@ -13,6 +13,7 @@ Before you start, make sure you have the following:
 5. **Service Account Key**: Create a service account in GCP with Editor access, and download its JSON key. (See instructions below)
 6. **Activate APIs**: Enable the Compute Engine and Cloud Storage APIs in your GCP project.
 7. **Set the variables in the terraform configuration** (see below)
+8. **Ansible Installed**: Install Ansible on your local machine. Refer to the [Ansible installation guide](https://docs.ansible.com/ansible/latest/installation_guide/index.html).
 
 ### GCP Service Account
 1. Create a Service Account in GCP
@@ -42,7 +43,28 @@ This will let you authenticate with your GCP account and select your project.
 2. Search for the Compute Engine API and enable it.
 3. Wait for the API to be enabled
 
-## Step-by-Step Instructions
+## Script usage
+
+You can use the `run-jenkins-install.sh` script to automate the Terraform setup process or just follow the step-by-step instructions below.
+Asumming you have the prerequisites set up, you are ready to run the script.
+2. create the `.terraform.tfvars` file
+2. run the script
+3. access Jenkins (with default init password displayed in the terminal at the end of the script)
+4. follow the Jenkins setup wizard
+
+The script will:
+- Use **terraform** to create the Jenkins instance on GCP
+- Display the **external IP** address of the Jenkins instance
+- Store the **ssh key** to access the Jenkins instance
+- update the **ansible inventory** file with the Jenkins instance IP
+- Use **Ansible** to install Jenkins on the instance
+- And finally, display the **initial admin password** to access Jenkins
+
+```sh
+run-jenkins-install.sh
+```
+
+## Step-by-Step Instructions (manual detailed instructions)
 
 ### 1. Set Up Terraform Configuration
 
@@ -106,11 +128,23 @@ This will let you authenticate with your GCP account and select your project.
 
    Type `yes` when prompted to confirm the creation of resources.
 
-### 3. Access Jenkins
+
+### 3. Install Jenkins
+After the Terraform configuration has successfully created your resources, find the external IP address of your Jenkins instance.
+
+1. update the `ansible/inventory` file with the Jenkins instance IP
+2. Run the Ansible playbook to install Jenkins on the instance:
+
+   ```sh
+   ansible-playbook -i ansible/inventory ansible/jenkins_setup.yml
+   ```
+_type `yes` if prompted to accept the ssh key fingerprint_
+
+### 4. Access Jenkins
 
 - After the Terraform configuration has successfully created your resources, find the external IP address of your Jenkins instance.
 - Open a browser and navigate to `http://<EXTERNAL_IP>:8080`.
-- Retrieve the initial admin password by running:
+- Retrieve the initial admin password by running on the Jenkins instance:
   ```sh
   sudo cat /var/lib/jenkins/secrets/initialAdminPassword
   ```
