@@ -35,9 +35,30 @@ job('Whanos base images/Build all base images') {
 job('link-project') {
     description('Link a project')
     parameters {
-        stringParam('PROJECT_NAME', '', 'Name of the project')
-        stringParam('GITHUB_NAME', '', 'GitHub repository owner/repo_name (e.g.: "Epitech/whanos")')
-        /*how to handle private repositories?*/
+        stringParam('REPO_URL', '', 'Git repository URL')
+        stringParam('BRANCH', 'main', 'Branch to monitor for changes (default is main)')
+        stringParam('PROJECT_NAME', '', 'Name of the project to name the job')
     }
-    steps {}
+    steps {
+        dsl {
+            text("""
+                job('Projects/' + PROJECT_NAME) {
+                    description('Builds and deploys the ${PROJECT_NAME} application.')
+
+                    scm {
+                        git {
+                            remote {
+                                url(REPO_URL)
+                            }
+                            branch(BRANCH)
+                        }
+                    }
+
+                    triggers {
+                        scm('* * * * *') // Check every minute for changes
+                    }
+                    """
+                )
+            }
+        }
 }

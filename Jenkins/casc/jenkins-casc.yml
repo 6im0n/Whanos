@@ -26,5 +26,5 @@ jenkins:
               - "Overall/Read"
             entries:
               - user: "user"
-# jobs:
-  # - file: job_dsl.groovy
+jobs:
+  - file: /var/jenkins_home/casc_configs/job_dsl.groovy
