@@ -39,24 +39,59 @@
       command: cat /var/lib/jenkins/secrets/initialAdminPassword
       register: jenkins_admin_password
 
-    - name: Upload Jenkins Configuration as Code (JCasC) file
+    - name: Download the Plugin Installation Manager Tool for Jenkins
+      get_url:
+          url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
+          dest: /tmp/jenkins-plugin-manager.jar
+
+    - name: Copy a file with the list of plugins to install
       copy:
-        src: ../casc/jenkins-casc.yml
-        dest: /var/lib/jenkins/jenkins-casc.yaml
+        src: ../casc/plugins.txt
+        dest: /tmp/plugins.txt
         owner: jenkins
         group: jenkins
         mode: '0644'
 
-    - name: Add Jenkins Configuration as Code environment variable
+    - name: Install Jenkins plugins (need to create a custom ansible module for this because when the playbook is re-run, the plugins are reinstalled anyway)
+      command: java -jar /tmp/jenkins-plugin-manager.jar --plugin-file /tmp/plugins.txt --war /usr/share/java/jenkins.war --plugin-download-directory /var/lib/jenkins/plugins
+
+    - name: Restart Jenkins to apply plugins
+      service:
+        name: jenkins
+        state: restarted
+
+    - name: Create Jenkins Configuration as Code (JCasC) directory
+      file:
+        path: /var/jenkins_home/casc_configs/
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Upload Jenkins Configuration as Code (JCasC) file
+      copy:
+        src: ../casc/jenkins-casc.yml
+        dest: /var/jenkins_home/casc_configs/jenkins.yaml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Skip Jenkins setup wizard and apply JCasC
       lineinfile:
-        path: /etc/default/jenkins
-        line: 'JAVA_ARGS="$JAVA_ARGS -Djenkins.install.runSetupWizard=false -Djenkins.config.file=/var/lib/jenkins/jenkins-casc.yaml"'
-        state: present
+        dest=/usr/lib/systemd/system/jenkins.service
+        regexp='^Environment="JAVA_OPTS=-Djava.awt.headless=true'
+        line='Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=/var/jenkins_home/casc_configs/jenkins.yaml"'
+      register: result_skip_startup_wizard
+
+    - name: deamon-reload
+      command: systemctl daemon-reload
+      when: result_skip_startup_wizard.changed
 
     - name: Restart Jenkins to apply JCasC
       service:
         name: jenkins
         state: restarted
+      when: result_skip_startup_wizard.changed
 
     - name: Display initial Jenkins admin password
       debug:

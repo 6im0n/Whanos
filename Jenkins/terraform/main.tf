@@ -11,7 +11,7 @@ resource "tls_private_key" "jenkins_ssh_key" {
 
 resource "google_compute_instance" "jenkins" {
   name         = "jenkins-server"
-  machine_type = "n1-standard-2"
+  machine_type = "n1-standard-2" # 2 vCPUs, 7.5 GB memory
   zone         = "europe-west1-b"
 
   boot_disk {
