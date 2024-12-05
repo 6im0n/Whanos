@@ -27,4 +27,4 @@ jenkins:
             entries:
               - user: "user"
 #jobs:
-# - file: /var/jenkins_home/casc_configs/job_dsl.groovy (crash the jenkins server init for now)
+ #- file: /var/jenkins_home/casc_configs/job_dsl.groovy (for the moment crash CF issue) //todo
