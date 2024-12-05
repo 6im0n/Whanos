@@ -25,19 +25,10 @@
         name: jenkins
         state: present
 
-    - name: start jenkins service
-      service:
-        name: jenkins
-        state: started
-
     - name: enable jenkins to start at boot time
       service:
         name: jenkins
         enabled: yes
-
-    - name: Retrieve initial Jenkins admin password
-      command: cat /var/lib/jenkins/secrets/initialAdminPassword
-      register: jenkins_admin_password
 
     - name: Download the Plugin Installation Manager Tool for Jenkins
       get_url:
@@ -54,11 +45,6 @@
 
     - name: Install Jenkins plugins (need to create a custom ansible module for this because when the playbook is re-run, the plugins are reinstalled anyway)
       command: java -jar /tmp/jenkins-plugin-manager.jar --plugin-file /tmp/plugins.txt --war /usr/share/java/jenkins.war --plugin-download-directory /var/lib/jenkins/plugins
-
-    - name: Restart Jenkins to apply plugins
-      service:
-        name: jenkins
-        state: restarted
 
     - name: Create Jenkins Configuration as Code (JCasC) directory
       file:
@@ -83,6 +69,14 @@
         line='Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=/var/jenkins_home/casc_configs/jenkins.yaml"'
       register: result_skip_startup_wizard
 
+    - name: Copy the job_dsl file
+      copy:
+          src: ../casc/job_dsl.groovy
+          dest: /var/jenkins_home/casc_configs/job_dsl.groovy
+          owner: jenkins
+          group: jenkins
+          mode: '0644'
+
     - name: deamon-reload
       command: systemctl daemon-reload
       when: result_skip_startup_wizard.changed
@@ -92,6 +86,10 @@
         name: jenkins
         state: restarted
       when: result_skip_startup_wizard.changed
+
+    - name: Retrieve initial Jenkins admin password
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_admin_password
 
     - name: Display initial Jenkins admin password
       debug:
