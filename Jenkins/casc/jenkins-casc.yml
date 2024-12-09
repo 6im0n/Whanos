@@ -6,10 +6,10 @@ jenkins:
       users:
         - name: admin
           id: admin
-          password: "${USER_ADMIN_PASSWORD}"
+          password: password
         - name: user
           id: user
-          password: "${USER_USER_PASSWORD}"
+          password: password
   authorizationStrategy:
     roleBased:
       roles:
@@ -26,5 +26,5 @@ jenkins:
               - "Overall/Read"
             entries:
               - user: "user"
-jobs:
-  - file: /var/jenkins_home/casc_configs/job_dsl.groovy
+#jobs:
+ #- file: /var/jenkins_home/casc_configs/job_dsl.groovy (for the moment crash CF issue) //todo
