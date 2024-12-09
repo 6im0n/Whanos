@@ -1,0 +1,30 @@
+jenkins:
+  systemMessage: "Welcome to jenkins whanos server"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - name: admin
+          id: admin
+          password: password
+        - name: user
+          id: user
+          password: password
+  authorizationStrategy:
+    roleBased:
+      roles:
+        global:
+          - name: "admin"
+            description: "Whanos master"
+            permissions:
+              - "Overall/Administer"
+            entries:
+              - user: "admin"
+          - name: "user"
+            description: "Whanos user"
+            permissions:
+              - "Overall/Read"
+            entries:
+              - user: "user"
+#jobs:
+ #- file: /var/jenkins_home/casc_configs/job_dsl.groovy (for the moment crash CF issue) //todo
