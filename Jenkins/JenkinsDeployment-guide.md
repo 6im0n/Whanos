@@ -11,7 +11,7 @@ Before you start, make sure you have the following:
 3. **Terraform Installed**: Install Terraform on your local machine. Refer to the [Terraform installation guide](https://www.terraform.io/downloads).
 4. **Google Cloud SDK**: Install Google Cloud SDK on your local machine. Follow the instructions [here](https://cloud.google.com/sdk/docs/install).
 5. **Service Account Key**: Create a service account in GCP with Editor access, and download its JSON key. (See instructions below)
-6. **Activate APIs**: Enable the Compute Engine and Cloud Storage APIs in your GCP project.
+6. **Activate APIs**: Enable the Compute Engine, Kubernetes Engine API  and Cloud Storage APIs in your GCP project.
 7. **Set the variables in the terraform configuration** (see below)
 8. **Ansible Installed**: Install Ansible on your local machine. Refer to the [Ansible installation guide](https://docs.ansible.com/ansible/latest/installation_guide/index.html).
 
@@ -61,7 +61,7 @@ The script will:
 - And finally, display the **initial admin password** to access Jenkins
 
 ```sh
-run-jenkins-install.sh
+ ~ Whanos/Jenkins$> run-jenkins-install.sh
 ```
 
 ## Step-by-Step Instructions (manual detailed instructions)
@@ -107,7 +107,7 @@ run-jenkins-install.sh
 1. **Initialize Terraform**:
 
    ```sh
-   terraform init
+ ~ Whanos/Jenkins/terraform$> terraform init
    ```
 
    This command downloads the necessary provider plugins.
@@ -123,7 +123,7 @@ run-jenkins-install.sh
 3. **Apply the Configuration**:
 
    ```sh
-   terraform apply
+ ~ Whanos/Jenkins/terraform$> terraform apply
    ```
 
    Type `yes` when prompted to confirm the creation of resources.
@@ -149,3 +149,11 @@ _type `yes` if prompted to accept the ssh key fingerprint_
   sudo cat /var/lib/jenkins/secrets/initialAdminPassword
   ```
 - Follow the Jenkins setup wizard to complete the installation.
+
+## Reset all the deployment resources on google cloud platform
+
+To delete all the resources created by Terraform, run the following command:
+
+```sh
+ ~ Whanos/Jenkins/terraform$> terraform destroy
+```

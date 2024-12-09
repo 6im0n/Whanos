@@ -1,3 +1,5 @@
+## VPS Instance
+
 provider "google" {
   credentials = file(var.service_account_key_path)
   project     = var.project_id
@@ -53,4 +55,31 @@ resource "google_compute_firewall" "default" {
 
   target_tags   = ["http-server", "https-server"]
   source_ranges = ["0.0.0.0/0"]
+}
+
+## Kubernetes Cluster
+
+resource "google_container_cluster" "kubernetes_cluster" {
+  name     = "kubernetes-cluster"
+  location = "europe-west1"
+  deletion_protection = false
+
+  node_config {
+    machine_type = "g1-small" # 1 vCPU, 0.6 GB memory
+    disk_size_gb = 10
+
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+  }
+
+  initial_node_count = 1
+}
+
+output "kubernetes_cluster_endpoint" {
+  value = google_container_cluster.kubernetes_cluster.endpoint
+}
+
+output "kubernetes_cluster_ca_certificate" {
+  value = base64decode(google_container_cluster.kubernetes_cluster.master_auth.0.cluster_ca_certificate)
 }
