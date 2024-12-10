@@ -1,8 +1,5 @@
 - hosts: jenkins
   become: true
-  vars:
-    user_admin_password: "{{ lookup('community.general.env', 'USER_ADMIN_PASSWORD') }}"
-    user_user_password: "{{ lookup('community.general.env', 'USER_USER_PASSWORD') }}"
 
   tasks:
     - name: add jenkins key
@@ -56,7 +53,7 @@
 
     - name: Upload Jenkins Configuration as Code (JCasC) file
       copy:
-        src: ../casc/jenkins-casc.yml
+        src: ../casc/jenkins-casc-resolved.yml
         dest: /var/jenkins_home/casc_configs/jenkins.yaml
         owner: jenkins
         group: jenkins

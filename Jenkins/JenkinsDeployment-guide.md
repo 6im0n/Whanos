@@ -61,10 +61,24 @@ The script will:
 - And finally, display the **initial admin password** to access Jenkins
 
 ```sh
- ~ Whanos/Jenkins$> run-jenkins-install.sh
+ ~ Whanos/Jenkins$> ./run-jenkins-install.sh
 ```
 
 ## Step-by-Step Instructions (manual detailed instructions)
+
+### 0. set up the environment for the deployment
+
+create an env file to store the secrets
+
+```bash
+ ~ Whanos/Jenkins/terraform$> touch .env
+```
+
+```txt
+JENKINS_ADMIN_PASSWORD=secureAdminPassword
+JENKINS_USER_PASSWORD=secureUserPassword
+```
+
 
 ### 1. Set Up Terraform Configuration
 
