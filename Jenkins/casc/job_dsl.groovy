@@ -40,7 +40,7 @@ freeStyleJob('link-project') {
     }
     steps {
         dsl {
-            text("""
+            text('''
                 freeStyleJob("Projects/${NAME}") {
                     scm {
                         git {
@@ -61,7 +61,7 @@ freeStyleJob('link-project') {
                         shell("casc/deploy.sh ${NAME}")
                     }
                 }
-            """)
+            ''')
         }
     }
 }
