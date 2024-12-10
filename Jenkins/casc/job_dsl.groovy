@@ -8,7 +8,7 @@ folder('Whanos base images') {
     description('Folder containing jobs to build the Whanos base images')
 }
 
-def languages = [c, java, javascript, python, befunge]
+def languages = ['c', 'java', 'javascript', 'python', 'befunge']
 
 languages.each { language ->
     job("Whanos base images/whanos-${language}") {
@@ -32,33 +32,36 @@ job('Whanos base images/Build all base images') {
     }
 }
 
-job('link-project') {
+freeStyleJob('link-project') {
     description('Link a project')
     parameters {
-        stringParam('REPO_URL', '', 'Git repository URL')
-        stringParam('BRANCH', 'main', 'Branch to monitor for changes (default is main)')
-        stringParam('PROJECT_NAME', '', 'Name of the project to name the job')
+        stringParam('REPO_URL', '', 'Git repository URL (e.g. "https://github.com/Chocolatine/choco.git")')
+        stringParam('NAME', '', 'Name of the project to name the job')
     }
     steps {
         dsl {
             text("""
-                job('Projects/' + PROJECT_NAME) {
-                    description('Builds and deploys the ${PROJECT_NAME} application.')
-
+                freeStyleJob("Projects/${NAME}") {
                     scm {
                         git {
                             remote {
-                                url(REPO_URL)
+                                name("origin")
+                                url("${REPO_URL}")
                             }
-                            branch(BRANCH)
                         }
                     }
 
                     triggers {
-                        scm('* * * * *') // Check every minute for changes
+                        scm('* * * * *')
                     }
-                    """
-                )
-            }
+                    wrappers {
+                        preBuildCleanup()
+                    }
+                    steps {
+                        shell("casc/deploy.sh ${NAME}")
+                    }
+                }
+            """)
         }
+    }
 }

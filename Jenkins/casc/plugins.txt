@@ -1,3 +1,9 @@
 configuration-as-code
 role-strategy
 job-dsl
+git
+script-security
+parameterized-trigger
+credentials
+structs
+ws-cleanup
