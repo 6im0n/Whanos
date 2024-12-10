@@ -85,7 +85,6 @@
       service:
         name: jenkins
         state: restarted
-      when: result_skip_startup_wizard.changed
 
     - name: Retrieve initial Jenkins admin password
       command: cat /var/lib/jenkins/secrets/initialAdminPassword
