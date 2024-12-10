@@ -1,0 +1,8 @@
+FROM node:20.9
+SHELL ["/bin/bash", "-c"]
+WORKDIR /app
+ONBUILD COPY package.json .
+ONBUILD COPY package-lock.json .
+ONBUILD RUN ["npm", "install"]
+ONBUILD COPY app/ ./app/
+CMD ["node", "."]

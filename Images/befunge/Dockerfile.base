@@ -1,0 +1,4 @@
+FROM debian:bullseye
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends befunge93
+CMD ["befunge93", "./main.bf"]

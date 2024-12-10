@@ -1,0 +1,8 @@
+FROM maven:3.9-openjdk-21
+SHELL ["/bin/bash", "-c"]
+WORKDIR /app
+ONBUILD COPY ./app/ ./app/
+ONBUILD RUN mvn package -f app/pom.xml
+ONBUILD RUN mv app/target/app.jar .
+ONBUILD RUN find . -not -name app.jar -delete
+CMD java -jar app.jar

@@ -1,0 +1,7 @@
+FROM python:3.12
+SHELL ["/bin/bash", "-c"]
+WORKDIR /app
+ONBUILD COPY requirements.txt requirements.txt
+ONBUILD RUN pip install -r requirements.txt
+ONBUILD COPY ./app ./app
+CMD [ "python3", "-m" , "app"]
