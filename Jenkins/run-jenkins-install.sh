@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Ensure $OUTPUT_FILE is deleted on script exit or interruption
+cleanup() {
+  echo "Cleaning up temporary files..."
+  rm -f "$OUTPUT_FILE"
+  rm -f jenkins_ssh_key.pem
+}
+trap cleanup EXIT
+
 # Function to display the loading bar with emoji animation
 show_loading_bar() {
   local duration=$1
@@ -111,7 +119,6 @@ TEMPLATE_FILE=./casc/jenkins-casc.yml
 OUTPUT_FILE=./casc/jenkins-casc-resolved.yml
 envsubst < $TEMPLATE_FILE > $OUTPUT_FILE
 
-Jenkins
 if [ "$VERBOSE" = true ]; then
   eval "ansible-playbook -i ./ansible/inventory.ini ./ansible/jenkins_setup.yml"
 else
