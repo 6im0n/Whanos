@@ -29,19 +29,22 @@ fi
 
 echo "${LANGUAGE[@]} found."
 
-if test -f "./Dockerfile"; then
-    echo "Using base image"
-    docker build . -t whanos-project-$1
-else
-    echo "Using standalone image"
-    docker build . -t whanos-project-$1 -f /images/$LANGUAGE/Dockerfile.standalone
-fi
-docker tag whanos-project-$1 localhost:5000/whanos-project-$1
-docker push localhost:5000/whanos-project-$1
-docker pull localhost:5000/whanos-project-$1
-docker rmi whanos-project-$1
+image_name=$DOCKER_REGISTRY/whanos/whanos-$1-${LANGUAGE[0]}
 
-if test -f "./whanos.yml"; then
+if [[ -f Dockerfile ]]; then
+	docker build . -t $image_name
+else
+  echo "Using standalone image"
+	docker build . \
+		-f /images/${LANGUAGE[0]}/Dockerfile.standalone \
+		-t $image_name
+fi
+
+if ! docker push $image_name; then
+	exit 1
+fi
+
+if [[ -f whanos.yml ]]; then
     echo "Deploying on kubernetes"
     FILE_CONTENT=`cat ./whanos.yml | base64 -w 0`
     curl -H "Content-Type: application/json" -X POST -d "{\"image\":\"localhost:5000/whanos-project-$1\",\"config\":\"$FILE_CONTENT\",\"name\":\"$1\"}" http://localhost:3030/deployments
