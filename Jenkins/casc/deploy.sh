@@ -29,25 +29,30 @@ fi
 
 echo "${LANGUAGE[@]} found."
 
-image_name=$DOCKER_REGISTRY/whanos/whanos-$1-${LANGUAGE[0]}
+source /home/gcloud/google-cloud-sdk/path.bash.inc
+
+source /var/jenkins_home/.env
+
+image_name=$REGISTRY_HOST/whanos-${LANGUAGE[0]}/$1
+
+echo "Building image $image_name"
 
 if [[ -f Dockerfile ]]; then
-	docker build . -t $image_name
+    echo "Dockerfile found in the application"
+    docker build . -t $image_name
 else
-  echo "Using standalone image"
-	docker build . \
-		-f /images/${LANGUAGE[0]}/Dockerfile.standalone \
-		-t $image_name
+    echo "Dockerfile not found in the application"
+    docker build . -t $image_name -f /var/jenkins_home/images/${LANGUAGE[0]}/Dockerfile.standalone
 fi
+
+docker push $image_name
 
 if test -f "./whanos.yml"; then
     echo "Whanos.yml file found in the application"
     echo "Trying to deploy"
-    ## generate the kububernetes file for the deployment
-    /var/jenkins_home/kubernetes/generate_deployement.sh localhost:5000/whanos-project-$1 $1
-    ./kubernetes/make_deployment.sh localhost:5000/whanos-project-$1 $1
-    curl -H "Content-Type: application/json" -X POST -d "{\"image\":\"localhost:5000/whanos-project-$1\",\"config\":\"$FILE_CONTENT\",\"name\":\"$1\"}" http://localhost:3030/deployments
+    ## generate the kubernetes file for the deployment
+    /var/jenkins_home/kube_scripts/generate_deployement.sh localhost:5000/whanos-project-$1 $1
+    cat deployment.yaml
+    kubectl apply -f deployment.yaml
+    kubectl describe services $1-service
 fi
-
-mkdir -p /usr/share/jenkins_hash
-echo `git log -n 1  | grep commit | awk '{ print $2 }'` > /usr/share/jenkins_hash/JENKINS_HASH_$1
