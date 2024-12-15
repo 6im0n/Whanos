@@ -27,6 +27,11 @@
         name: git
         state: present
 
+    - name: install yg package
+      apt:
+        name: yq
+        state: present
+
     - name: Install kubectl
       apt:
         name: kubectl
@@ -129,7 +134,7 @@
         dest: /var/jenkins_home/kube_scripts/
         owner: jenkins
         group: jenkins
-        mode: '0644'
+        mode: '0755'
 
     - name: Upload images of the application
       copy:
