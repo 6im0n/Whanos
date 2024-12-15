@@ -23,7 +23,7 @@ if [[ ${#LANGUAGE[@]} == 0 ]]; then
 	exit 1
 fi
 if [[ ${#LANGUAGE[@]} != 1 ]]; then
-	echo "Invalid project: more than one language criterias matched (${LANGUAGE[@]})."
+	echo "Invalid project: more than one language criteria matched (${LANGUAGE[@]})."
 	exit 1
 fi
 
@@ -42,9 +42,13 @@ docker pull localhost:5000/whanos-project-$1
 docker rmi whanos-project-$1
 
 if test -f "./whanos.yml"; then
-    echo "Deploying on kubernetes"
-    FILE_CONTENT=`cat ./whanos.yml | base64 -w 0`
+    echo "Whanos.yml file found in the application"
+    echo "Trying to deploy"
+    ## generate the kububernetes file for the deployment
+    /var/jenkins_home/kubernetes/generate_deployement.sh localhost:5000/whanos-project-$1 $1
+    ./kubernetes/make_deployment.sh localhost:5000/whanos-project-$1 $1
     curl -H "Content-Type: application/json" -X POST -d "{\"image\":\"localhost:5000/whanos-project-$1\",\"config\":\"$FILE_CONTENT\",\"name\":\"$1\"}" http://localhost:3030/deployments
 fi
+
 mkdir -p /usr/share/jenkins_hash
 echo `git log -n 1  | grep commit | awk '{ print $2 }'` > /usr/share/jenkins_hash/JENKINS_HASH_$1
