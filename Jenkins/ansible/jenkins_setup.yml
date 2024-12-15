@@ -27,6 +27,11 @@
         name: git
         state: present
 
+    - name: Install kubectl
+      apt:
+        name: kubectl
+        state: present
+
     - name: Enable Jenkins to start at boot time
       service:
         name: jenkins
@@ -66,6 +71,26 @@
         groups: docker
         append: yes
 
+    - name: Download the gcloud CLI
+      command: curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.g
+
+    - name: create gcloud folder in /home
+      file:
+        path: /home/gcloud
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+
+    - name: Untar the gcloud CLI
+      command: tar -xvf google-cloud-cli-linux-x86_64.tar.gz -C /home/gcloud
+
+    - name: Install the gcloud CLI
+      command: /home/gcloud/google-cloud-sdk/install.sh --quiet
+
+    - name: Install the kubectl CLI
+      command: /home/gcloud/google-cloud-sdk/bin/gcloud components install kubectl --quiet
+
     - name: Download the Plugin Installation Manager Tool for Jenkins
       get_url:
         url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
@@ -79,7 +104,6 @@
         group: jenkins
         mode: '0644'
 
-    # (to improve => need to create a custom ansible module for this because when the playbook is re-run, the plugins are reinstalled anyway)
     - name: Install Jenkins plugins
       command: java -jar /tmp/jenkins-plugin-manager.jar --plugin-file /tmp/plugins.txt --war /usr/share/java/jenkins.war --plugin-download-directory /var/lib/jenkins/plugins
 
@@ -107,6 +131,14 @@
         group: jenkins
         mode: '0644'
 
+    - name: Upload images of the application
+      copy:
+        src: ../../images/
+        dest: /var/jenkins_home/images/
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
     - name: Upload deploy scripts
       copy:
         src: ../casc/deploy.sh
@@ -114,6 +146,15 @@
         owner: jenkins
         group: jenkins
         mode: '0755'
+
+    - name: Upload .env file for deploy.sh
+      copy:
+        src: ../.env
+        dest: /var/jenkins_home/.env
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
 
     - name: Skip Jenkins setup wizard and apply JCasC
       lineinfile:
