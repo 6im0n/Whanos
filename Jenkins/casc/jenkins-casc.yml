@@ -6,10 +6,10 @@ jenkins:
       users:
         - name: admin
           id: admin
-          password: password
+          password: "${JENKINS_ADMIN_PASSWORD}"
         - name: user
           id: user
-          password: password
+          password: "${JENKINS_USER_PASSWORD}"
   authorizationStrategy:
     roleBased:
       roles:
