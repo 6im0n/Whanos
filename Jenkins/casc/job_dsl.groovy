@@ -8,7 +8,23 @@ folder('Whanos base images') {
     description('Folder containing jobs to build the Whanos base images')
 }
 
-def languages = [c, java, javascript, python, befunge]
+def languages = ['c', 'java', 'javascript', 'python', 'befunge']
+
+freeStyleJob("google-cloud-artifacts-auth") {
+  parameters{
+    stringParam("GOOGLE_PROJECT_ID", null, "Your Google Cloud project ID ex: whanos-123456")
+    fileParam("gcloud-service-account-key.json", "Service account key file ex: gcloud-service-account-key.json")
+    stringParam("GCLOUD_KUBERNETE_CLUSTER_NAME", null, "Name of the cluster ex: whanos-cluster")
+    stringParam("GCLOUD_KUBERNETE_CLUSTER_LOCATION", null, "Location of the cluster ex: europe-west9")
+    stringParam("GOOGLE_ARTIFACT_REGISTRY_ZONE", "europe-west9-docker", "Google artifact registry zone ex : europe-west9-docker")
+  }
+  steps {
+    shell("cat gcloud-service-account-key.json | docker login -u _json_key --password-stdin https://\$GOOGLE_ARTIFACT_REGISTRY_ZONE.pkg.dev")
+    shell("/home/gcloud/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=gcloud-service-account-key.json")
+    shell("/home/gcloud/google-cloud-sdk/bin/gcloud config set project \$GOOGLE_PROJECT_ID")
+    shell("/home/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials \$GCLOUD_KUBERNETE_CLUSTER_NAME --zone \$GCLOUD_KUBERNETE_CLUSTER_LOCATION")
+  }
+}
 
 languages.each { language ->
     job("Whanos base images/whanos-${language}") {
@@ -32,33 +48,35 @@ job('Whanos base images/Build all base images') {
     }
 }
 
-job('link-project') {
+freeStyleJob('link-project') {
     description('Link a project')
     parameters {
-        stringParam('REPO_URL', '', 'Git repository URL')
-        stringParam('BRANCH', 'main', 'Branch to monitor for changes (default is main)')
-        stringParam('PROJECT_NAME', '', 'Name of the project to name the job')
+        stringParam('REPO_URL', '', 'Git repository URL (e.g. "https://github.com/Chocolatine/choco.git")')
+        stringParam('NAME', '', 'Name of the project to name the job')
     }
     steps {
         dsl {
-            text("""
-                job('Projects/' + PROJECT_NAME) {
-                    description('Builds and deploys the ${PROJECT_NAME} application.')
-
+            text('''
+                freeStyleJob("Projects/${NAME}") {
                     scm {
                         git {
                             remote {
-                                url(REPO_URL)
+                                name("origin")
+                                url("${REPO_URL}")
                             }
-                            branch(BRANCH)
                         }
                     }
-
                     triggers {
-                        scm('* * * * *') // Check every minute for changes
+                        scm('* * * * *')
                     }
-                    """
-                )
-            }
+                    wrappers {
+                        preBuildCleanup()
+                    }
+                    steps {
+                        shell("/var/jenkins_home/deploy.sh ${NAME}")
+                    }
+                }
+            ''')
         }
+    }
 }

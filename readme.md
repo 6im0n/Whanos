@@ -54,9 +54,9 @@ Supported languages are:
 
 ## **🎮 How to Use:**
 
-```bash
-
-```
+1. Check the script to deploy jenkins instance
+2. Connect to the jenkins instance
+3. Accept the 
 
 ## **👐 Contribute:**
 

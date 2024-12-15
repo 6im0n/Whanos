@@ -3,7 +3,14 @@ configuration-as-code
 credentials
 git
 job-dsl
-script-security
+structs
+role-strategy
+job-dsl
+git
+parameterized-trigger
+credentials
 structs
 role-strategy
 ws-cleanup
+workflow-aggregator
+script-security

@@ -1,0 +1,10 @@
+FROM alpine
+WORKDIR /app
+RUN apk add --no-cache bash
+SHELL [ "/bin/bash", "-c" ]
+RUN apk add git
+RUN apk add make
+RUN apk add build-base
+RUN git clone https://github.com/catseye/Befunge-93.git befunge
+ONBUILD RUN cd befunge && make
+ONBUILD RUN mv /app/befunge/bin/bef /app/bef

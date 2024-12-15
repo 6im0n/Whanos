@@ -1,0 +1,6 @@
+FROM python:3.13-alpine
+WORKDIR /app
+RUN apk add --no-cache bash
+SHELL [ "/bin/bash", "-c" ]
+ONBUILD COPY requirements.txt .
+ONBUILD RUN pip install -r requirements.txt

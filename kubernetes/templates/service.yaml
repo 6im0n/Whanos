@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: whanos-name-service
+  labels:
+    app: whanos-name
+spec:
+  type: LoadBalancer
+  selector:
+    app: whanos-name
+  ports:
+    - port: port

@@ -1,0 +1,8 @@
+FROM python:3.13-alpine
+WORKDIR /app
+RUN apk add --no-cache bash
+SHELL [ "/bin/bash", "-c" ]
+COPY . .
+RUN if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+EXPOSE 8080
+CMD ["python", "-m", "app"]

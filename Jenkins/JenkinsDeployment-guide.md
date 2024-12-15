@@ -11,7 +11,7 @@ Before you start, make sure you have the following:
 3. **Terraform Installed**: Install Terraform on your local machine. Refer to the [Terraform installation guide](https://www.terraform.io/downloads).
 4. **Google Cloud SDK**: Install Google Cloud SDK on your local machine. Follow the instructions [here](https://cloud.google.com/sdk/docs/install).
 5. **Service Account Key**: Create a service account in GCP with Editor access, and download its JSON key. (See instructions below)
-6. **Activate APIs**: Enable the Compute Engine, Kubernetes Engine API  and Cloud Storage APIs in your GCP project.
+6. **Activate APIs**: Enable the Compute Engine, Kubernetes Engine API  and Cloud Storage APIs in your GCP project, Cloud resource manager API, Artifact Registry API
 7. **Set the variables in the terraform configuration** (see below)
 8. **Ansible Installed**: Install Ansible on your local machine. Refer to the [Ansible installation guide](https://docs.ansible.com/ansible/latest/installation_guide/index.html).
 
@@ -94,6 +94,7 @@ create an env file to store the secrets
 ```txt
 JENKINS_ADMIN_PASSWORD=secureAdminPassword
 JENKINS_USER_PASSWORD=secureUserPassword
+REGISTRY_HOST=eu.gcr.io # get it when the registry is created with terraform
 ```
 
 
