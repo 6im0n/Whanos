@@ -28,9 +28,10 @@
         state: present
 
     - name: install yg package
-      apt:
-        name: yq
-        state: present
+      command: wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+
+    - name: Make yq executable
+      command: chmod +x /usr/bin/yq
 
     - name: Install kubectl
       apt:

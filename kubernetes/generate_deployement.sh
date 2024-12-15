@@ -9,6 +9,9 @@ fi
 image="$1"
 project_name="$2"
 
+echo "Generating deployment.yaml for $project_name"
+echo "Image: $image"
+
 # Define paths
 deployment_template="/var/jenkins_home/kube_scripts/templates/deployment.yaml"
 service_template="/var/jenkins_home/kube_scripts/templates/service.yaml"
@@ -31,8 +34,9 @@ replicas=$(yq eval '.deployment.replicas // 1' <<< "$whanos")
 ports=($(yq eval '.deployment.ports[]' <<< "$whanos" 2>/dev/null))
 
 # Update deployment placeholders
-deployment=$(echo "$deployment" | sed "s/whanos-name/$project_name/g")
-deployment=$(echo "$deployment" | sed "s/whanos-image/$image/g")
+echo "Updating deployment placeholders"
+deployment=$(echo "$deployment" | sed "s|whanos-name|$project_name|g")
+deployment=$(echo "$deployment" | sed "s|whanos-image|$image|g")
 deployment=$(echo "$deployment" | yq eval ".spec.replicas = $replicas" -)
 
 # Handle ports in deployment

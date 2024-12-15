@@ -50,8 +50,9 @@ docker push $image_name
 if test -f "./whanos.yml"; then
     echo "Whanos.yml file found in the application"
     echo "Trying to deploy"
+    cat whanos.yml
     ## generate the kubernetes file for the deployment
-    /var/jenkins_home/kube_scripts/generate_deployement.sh localhost:5000/whanos-project-$1 $1
+    /var/jenkins_home/kube_scripts/generate_deployement.sh $image_name $1
     cat deployment.yaml
     kubectl apply -f deployment.yaml
     kubectl describe services $1-service
