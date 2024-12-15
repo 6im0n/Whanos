@@ -112,6 +112,12 @@ printf "🔙 Retrieving SSH key from Terraform output...\n"
 terraform output -raw jenkins_ssh_private_key > ../jenkins_ssh_key.pem
 chmod 600 ../jenkins_ssh_key.pem
 
+# Step 6: retrieve the artifact registry URL
+printf "🔙 Retrieving artifact registry URL from Terraform output...\n"
+echo | terraform output -raw docker_registry_url
+echo ""
+
+
 # Step 6: Go Back to the Root Directory
 printf "🔐 Returning to root directory...\n"
 cd ..
@@ -138,9 +144,7 @@ envsubst < $TEMPLATE_FILE > $OUTPUT_FILE
 if [ "$VERBOSE" = true ]; then
   eval "ansible-playbook -i ./ansible/inventory.ini ./ansible/jenkins_setup.yml"
 else
-  printf "🔒 Get the initial Jenkins admin password:\n"
-  output=$(ansible-playbook -i ./ansible/inventory.ini ./ansible/jenkins_setup.yml | grep 'Initial Jenkins admin password is')
-  echo -e "\033[0;32m${output}\033[0m"
+  eval "ansible-playbook -i ./ansible/inventory.ini ./ansible/jenkins_setup.yml > /dev/null 2>&1"
 fi
 rm -f $OUTPUT_FILE
 
