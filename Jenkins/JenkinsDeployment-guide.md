@@ -94,7 +94,7 @@ create an env file to store the secrets
 ```txt
 JENKINS_ADMIN_PASSWORD=secureAdminPassword
 JENKINS_USER_PASSWORD=secureUserPassword
-REGISTRY_HOST=eu.gcr.io
+REGISTRY_HOST=eu.gcr.io # get it when the registry is created with terraform
 ```
 
 
