@@ -1,3 +1,4 @@
+cloudbees-folder
 configuration-as-code
 role-strategy
 job-dsl
@@ -6,4 +7,6 @@ script-security
 parameterized-trigger
 credentials
 structs
+role-strategy
 ws-cleanup
+workflow-aggregator

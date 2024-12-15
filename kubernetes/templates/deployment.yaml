@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: whanos-name-deployment
+  name: whanos-name
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whanos-name
+  template:
+    metadata:
+      labels:
+        app: whanos-name
+    spec:
+      containers:
+        - name: whanos-name
+          image: whanos-image
+          ports:
+            - containerPort: port
+          imagePullPolicy: Always
+      restartPolicy: Always

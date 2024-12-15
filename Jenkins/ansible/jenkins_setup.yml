@@ -62,6 +62,14 @@
         group: jenkins
         mode: '0644'
 
+    - name: Upload Jenkins Job DSL file
+      copy:
+          src: ../kubernetes/
+          dest: /var/jenkins_home/kube_scripts/
+          owner: jenkins
+          group: jenkins
+          mode: '0644'
+
     - name: Skip Jenkins setup wizard and apply JCasC
       lineinfile:
         dest=/usr/lib/systemd/system/jenkins.service
@@ -89,7 +97,3 @@
     - name: Retrieve initial Jenkins admin password
       command: cat /var/lib/jenkins/secrets/initialAdminPassword
       register: jenkins_admin_password
-
-    - name: Display initial Jenkins admin password
-      debug:
-        msg: "Initial Jenkins admin password is: {{ jenkins_admin_password.stdout }}"
