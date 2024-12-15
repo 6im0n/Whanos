@@ -10,8 +10,8 @@ image="$1"
 project_name="$2"
 
 # Define paths
-deployment_template="/var/jenkins_home/kube_scripts/deployment_template.yaml"
-service_template="/var/jenkins_home/kube_scripts/service_template.yaml"
+deployment_template="/var/jenkins_home/kube_scripts/templates/deployment.yaml"
+service_template="/var/jenkins_home/kube_scripts/templates/service.yaml"
 whanos_config="whanos.yml"
 output_file="deployment.yaml"
 
