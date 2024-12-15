@@ -10,6 +10,22 @@ folder('Whanos base images') {
 
 def languages = ['c', 'java', 'javascript', 'python', 'befunge']
 
+freeStyleJob("google-cloud-artifacts-auth") {
+  parameters{
+    stringParam("GOOGLE_PROJECT_ID", null, "Your Google Cloud project ID ex: whanos-123456")
+    fileParam("gcloud-service-account-key.json", "Service account key file ex: gcloud-service-account-key.json")
+    stringParam("GCLOUD_KUBERNETE_CLUSTER_NAME", null, "Name of the cluster ex: whanos-cluster")
+    stringParam("GCLOUD_KUBERNETE_CLUSTER_LOCATION", null, "Location of the cluster ex: europe-west9")
+    stringParam("GOOGLE_ARTIFACT_REGISTRY_ZONE", "europe-west9-docker", "Google artifact registry zone ex : europe-west9-docker")
+  }
+  steps {
+    shell("cat gcloud-service-account-key.json | docker login -u _json_key --password-stdin https://\$GOOGLE_ARTIFACT_REGISTRY_ZONE.pkg.dev")
+    shell("/home/gcloud/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file=gcloud-service-account-key.json")
+    shell("/home/gcloud/google-cloud-sdk/bin/gcloud config set project \$GOOGLE_PROJECT_ID")
+    shell("/home/gcloud/google-cloud-sdk/bin/gcloud container clusters get-credentials \$GCLOUD_KUBERNETE_CLUSTER_NAME --zone \$GCLOUD_KUBERNETE_CLUSTER_LOCATION")
+  }
+}
+
 languages.each { language ->
     job("Whanos base images/whanos-${language}") {
         description("Build the base image for Whanos ${language}")
@@ -50,7 +66,6 @@ freeStyleJob('link-project') {
                             }
                         }
                     }
-
                     triggers {
                         scm('* * * * *')
                     }
@@ -58,7 +73,7 @@ freeStyleJob('link-project') {
                         preBuildCleanup()
                     }
                     steps {
-                        shell("casc/deploy.sh ${NAME}")
+                        shell("/var/jenkins_home/deploy.sh ${NAME}")
                     }
                 }
             ''')
