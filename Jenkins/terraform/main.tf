@@ -1,5 +1,4 @@
-## VPS Instance
-
+# VPS Instance
 provider "google" {
   credentials = file(var.service_account_key_path)
   project     = var.project_id
@@ -57,8 +56,7 @@ resource "google_compute_firewall" "default" {
   source_ranges = ["0.0.0.0/0"]
 }
 
-## Kubernetes Cluster
-
+# Kubernetes Cluster
 resource "google_container_cluster" "kubernetes_cluster" {
   name     = "kubernetes-cluster"
   location = "europe-west1"
@@ -82,4 +80,30 @@ output "kubernetes_cluster_endpoint" {
 
 output "kubernetes_cluster_ca_certificate" {
   value = base64decode(google_container_cluster.kubernetes_cluster.master_auth.0.cluster_ca_certificate)
+}
+
+
+# Docker Artifact Registry
+resource "google_artifact_registry_repository" "docker_registry" {
+  repository_id = "docker-registry"  # Unique ID for the repository
+  location      = "europe-west1"
+  description   = "Artifact registry to store Docker images"
+  format        = "DOCKER"
+
+  labels = {
+    environment = "production"
+    purpose     = "docker-image-storage"
+  }
+}
+
+# IAM Policy Binding for Artifact Registry
+resource "google_artifact_registry_repository_iam_member" "docker_registry_user" {
+  repository = google_artifact_registry_repository.docker_registry.id
+  role       = "roles/artifactregistry.writer"
+  member     = "serviceAccount:${var.service_account_email}"
+}
+
+# Output the Registry URL
+output "docker_registry_url" {
+  value = "europe-west1-docker.pkg.dev/${var.project_id}/docker-registry"
 }

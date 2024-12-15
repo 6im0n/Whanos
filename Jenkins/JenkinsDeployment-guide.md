@@ -29,13 +29,30 @@ You need a service account key to allow Terraform to authenticate with GCP.
 2. Set Up Google Cloud SDK (gcloud) (this is optional)
 
    Install Google Cloud SDK on your local machine. This helps you interact with GCP from the command line:
-   Follow the installation instructions for your OS from Google Cloud SDK.
+    - Download and install the SDK from the [Google Cloud SDK documentation](https://cloud.google.com/sdk/docs/install).
    Initialize GCP by running:
 3. 
 ```sh
    gcloud init
 ```
 This will let you authenticate with your GCP account and select your project.
+
+4. for docker artifact storage set the permissions to push on the registry
+
+set the permissions to push on the registry on admin
+```sh
+gcloud projects add-iam-policy-binding <PROJECT_ID> \
+    --member="serviceAccount:<SERVICE_ACCOUNT_EMAIL>" \
+    --role="roles/artifactregistry.admin"
+```
+
+set the permissions to push on the registry on writer
+```sh
+```sh
+gcloud projects add-iam-policy-binding <PROJECT_ID> \
+    --member="serviceAccount:<SERVICE_ACCOUNT_EMAIL>" \
+    --role="roles/artifactregistry.writer"
+```
 
 ### GPC activation APIs
 
@@ -61,10 +78,24 @@ The script will:
 - And finally, display the **initial admin password** to access Jenkins
 
 ```sh
- ~ Whanos/Jenkins$> run-jenkins-install.sh
+ ~ Whanos/Jenkins$> ./run-jenkins-install.sh
 ```
 
 ## Step-by-Step Instructions (manual detailed instructions)
+
+### 0. set up the environment for the deployment
+
+create an env file to store the secrets
+
+```bash
+ ~ Whanos/Jenkins/terraform$> touch .env
+```
+
+```txt
+JENKINS_ADMIN_PASSWORD=secureAdminPassword
+JENKINS_USER_PASSWORD=secureUserPassword
+```
+
 
 ### 1. Set Up Terraform Configuration
 
