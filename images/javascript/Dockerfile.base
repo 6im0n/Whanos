@@ -1,4 +1,4 @@
-FROM node:20.9
+FROM node:latest
 SHELL ["/bin/bash", "-c"]
 WORKDIR /app
 ONBUILD COPY package.json .

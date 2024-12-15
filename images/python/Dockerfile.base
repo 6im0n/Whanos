@@ -1,7 +1,6 @@
-FROM python:3.12
-SHELL ["/bin/bash", "-c"]
+FROM python:3.13-alpine
 WORKDIR /app
-ONBUILD COPY requirements.txt requirements.txt
+RUN apk add --no-cache bash
+SHELL [ "/bin/bash", "-c" ]
+ONBUILD COPY requirements.txt .
 ONBUILD RUN pip install -r requirements.txt
-ONBUILD COPY ./app ./app
-CMD [ "python3", "-m" , "app"]
