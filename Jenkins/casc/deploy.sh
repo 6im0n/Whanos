@@ -29,17 +29,16 @@ fi
 
 echo "${LANGUAGE[@]} found."
 
-if test -f "./Dockerfile"; then
-    echo "Using base image"
-    docker build . -t whanos-project-$1
+image_name=$DOCKER_REGISTRY/whanos/whanos-$1-${LANGUAGE[0]}
+
+if [[ -f Dockerfile ]]; then
+	docker build . -t $image_name
 else
-    echo "Using standalone image"
-    docker build . -t whanos-project-$1 -f /images/$LANGUAGE/Dockerfile.standalone
+  echo "Using standalone image"
+	docker build . \
+		-f /images/${LANGUAGE[0]}/Dockerfile.standalone \
+		-t $image_name
 fi
-docker tag whanos-project-$1 localhost:5000/whanos-project-$1
-docker push localhost:5000/whanos-project-$1
-docker pull localhost:5000/whanos-project-$1
-docker rmi whanos-project-$1
 
 if test -f "./whanos.yml"; then
     echo "Whanos.yml file found in the application"
