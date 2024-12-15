@@ -2,35 +2,74 @@
   become: true
 
   tasks:
-    - name: add jenkins key
-      apt_key:  # ansible module to add key
-        url:  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    - name: Add Jenkins key
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
         state: present
 
-    - name: add jenkins repo
-      apt_repository: #ansible module to add repo
+    - name: Add Jenkins repo
+      apt_repository:
         repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
         state: present
 
-    - name: install java
+    - name: Install Java
       apt:
         name: openjdk-17-jre
         state: present
 
-    - name: install jenkins  #install jenkins
+    - name: Install Jenkins
       apt:
         name: jenkins
         state: present
 
-    - name: enable jenkins to start at boot time
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - name: Enable Jenkins to start at boot time
       service:
         name: jenkins
         enabled: yes
 
+    - name: Install prerequisites for Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable'
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Add Jenkins user to the Docker group
+      user:
+        name: jenkins
+        groups: docker
+        append: yes
+
     - name: Download the Plugin Installation Manager Tool for Jenkins
       get_url:
-          url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
-          dest: /tmp/jenkins-plugin-manager.jar
+        url: https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/2.13.2/jenkins-plugin-manager-2.13.2.jar
+        dest: /tmp/jenkins-plugin-manager.jar
 
     - name: Copy a file with the list of plugins to install
       copy:
@@ -40,7 +79,8 @@
         group: jenkins
         mode: '0644'
 
-    - name: Install Jenkins plugins (need to create a custom ansible module for this because when the playbook is re-run, the plugins are reinstalled anyway)
+    # (to improve => need to create a custom ansible module for this because when the playbook is re-run, the plugins are reinstalled anyway)
+    - name: Install Jenkins plugins
       command: java -jar /tmp/jenkins-plugin-manager.jar --plugin-file /tmp/plugins.txt --war /usr/share/java/jenkins.war --plugin-download-directory /var/lib/jenkins/plugins
 
     - name: Create Jenkins Configuration as Code (JCasC) directory
@@ -59,30 +99,38 @@
         group: jenkins
         mode: '0644'
 
-    - name: Upload Jenkins Job DSL file
+    - name: Upload Kubernetes scripts
       copy:
-          src: ../kubernetes/
-          dest: /var/jenkins_home/kube_scripts/
-          owner: jenkins
-          group: jenkins
-          mode: '0644'
+        src: ../../kubernetes/
+        dest: /var/jenkins_home/kube_scripts/
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+
+    - name: Upload deploy scripts
+      copy:
+        src: ../casc/deploy.sh
+        dest: /var/jenkins_home/deploy.sh
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
 
     - name: Skip Jenkins setup wizard and apply JCasC
       lineinfile:
-        dest=/usr/lib/systemd/system/jenkins.service
-        regexp='^Environment="JAVA_OPTS=-Djava.awt.headless=true'
-        line='Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=/var/jenkins_home/casc_configs/jenkins.yaml"'
+        dest: /usr/lib/systemd/system/jenkins.service
+        regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true'
+        line: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=/var/jenkins_home/casc_configs/jenkins.yaml"'
       register: result_skip_startup_wizard
 
     - name: Copy the job_dsl file
       copy:
-          src: ../casc/job_dsl.groovy
-          dest: /var/jenkins_home/casc_configs/job_dsl.groovy
-          owner: jenkins
-          group: jenkins
-          mode: '0644'
+        src: ../casc/job_dsl.groovy
+        dest: /var/jenkins_home/casc_configs/job_dsl.groovy
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
 
-    - name: deamon-reload
+    - name: Reload systemd daemon
       command: systemctl daemon-reload
       when: result_skip_startup_wizard.changed
 
@@ -90,7 +138,3 @@
       service:
         name: jenkins
         state: restarted
-
-    - name: Retrieve initial Jenkins admin password
-      command: cat /var/lib/jenkins/secrets/initialAdminPassword
-      register: jenkins_admin_password
