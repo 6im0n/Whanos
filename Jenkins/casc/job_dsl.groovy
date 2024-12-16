@@ -47,12 +47,16 @@ job('Whanos base images/Build all base images') {
         downstream(languages.collect { "Whanos base images/whanos-${it}" }, 'SUCCESS')
     }
 }
-
 freeStyleJob('link-project') {
     description('Link a project')
     parameters {
         stringParam('REPO_URL', '', 'Git repository URL (e.g. "https://github.com/Chocolatine/choco.git")')
         stringParam('NAME', '', 'Name of the project to name the job')
+        credentialsParam('GIT_CREDENTIALS') {
+            type('com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey')
+            description('SSH key to clone repository')
+            required(true)
+        }
     }
     steps {
         dsl {
@@ -63,6 +67,7 @@ freeStyleJob('link-project') {
                             remote {
                                 name("origin")
                                 url("${REPO_URL}")
+                                credentials("${GIT_CREDENTIALS}")
                             }
                         }
                     }

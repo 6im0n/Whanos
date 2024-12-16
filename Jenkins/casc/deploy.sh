@@ -56,4 +56,7 @@ if test -f "./whanos.yml"; then
     cat deployment.yaml
     kubectl apply -f deployment.yaml
     kubectl describe services $1-service
+    kubectl get services $1-service
+    kubectl get services $1-service -o jsonpath='http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}'
+    echo ""
 fi
