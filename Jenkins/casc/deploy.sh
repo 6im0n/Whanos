@@ -39,7 +39,7 @@ echo "Building image $image_name"
 
 if [[ -f Dockerfile ]]; then
     echo "Dockerfile found in the application"
-    docker build . -t $image_name
+    docker build . -t $image_name - < /var/jenkins_home/images/${LANGUAGE[0]}/Dockerfile.base
 else
     echo "Dockerfile not found in the application"
     docker build . -t $image_name -f /var/jenkins_home/images/${LANGUAGE[0]}/Dockerfile.standalone
@@ -56,4 +56,7 @@ if test -f "./whanos.yml"; then
     cat deployment.yaml
     kubectl apply -f deployment.yaml
     kubectl describe services $1-service
+    kubectl get services $1-service
+    kubectl get services $1-service -o jsonpath='http://{.status.loadBalancer.ingress[0].ip}:{.spec.ports[0].port}'
+    echo ""
 fi

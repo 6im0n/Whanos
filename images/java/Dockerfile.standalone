@@ -1,4 +1,4 @@
-FROM maven:3.8.5-openjdk-17 as builder
+FROM maven:3.8.5-openjdk-21 as builder
 WORKDIR /app
 SHELL [ "/bin/bash", "-c" ]
 COPY /app /app

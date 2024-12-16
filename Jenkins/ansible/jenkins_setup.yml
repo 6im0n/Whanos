@@ -88,8 +88,13 @@
         group: jenkins
         mode: '0755'
 
+    - name: Download the gcloud CLI
+      get_url:
+        url: https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
+        dest: /home/gcloud/google-cloud-cli-linux-x86_64.tar.gz
+
     - name: Untar the gcloud CLI
-      command: tar -xvf google-cloud-cli-linux-x86_64.tar.gz -C /home/gcloud
+      command: tar -xvf /home/gcloud/google-cloud-cli-linux-x86_64.tar.gz -C /home/gcloud
 
     - name: Install the gcloud CLI
       command: /home/gcloud/google-cloud-sdk/install.sh --quiet
