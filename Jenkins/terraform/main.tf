@@ -18,6 +18,7 @@ resource "google_compute_instance" "jenkins" {
   boot_disk {
     initialize_params {
       image = "debian-cloud/debian-11"
+      size = 25
     }
   }
 
@@ -64,7 +65,7 @@ resource "google_container_cluster" "kubernetes_cluster" {
 
   node_config {
     machine_type = "g1-small" # 1 vCPU, 0.6 GB memory
-    disk_size_gb = 20
+    disk_size_gb = 10
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
