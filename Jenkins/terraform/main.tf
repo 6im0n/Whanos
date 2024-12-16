@@ -64,7 +64,7 @@ resource "google_container_cluster" "kubernetes_cluster" {
 
   node_config {
     machine_type = "g1-small" # 1 vCPU, 0.6 GB memory
-    disk_size_gb = 10
+    disk_size_gb = 20
 
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
