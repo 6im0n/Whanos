@@ -32,7 +32,7 @@ languages.each { language ->
         steps {
             shell("""
                 echo "Building Whanos base image for ${language}"
-                docker build -t whanos-${language} -f Dockerfile.${language} .
+                docker build -t whanos-${language} -f /var/jenkins_home/images/${language}/Dockerfile.base /var/jenkins_home/images/${language}
             """)
         }
     }
