@@ -39,7 +39,7 @@ echo "Building image $image_name"
 
 if [[ -f Dockerfile ]]; then
     echo "Dockerfile found in the application"
-    docker build . -t $image_name
+    docker build . -t $image_name - < /var/jenkins_home/images/${LANGUAGE[0]}/Dockerfile.base
 else
     echo "Dockerfile not found in the application"
     docker build . -t $image_name -f /var/jenkins_home/images/${LANGUAGE[0]}/Dockerfile.standalone
