@@ -1,7 +1,7 @@
 # 🩻 Whanos
 
 <p align="center">
-<img width="800" height="400" src="https://www.morethansap.com/wp-content/uploads/2022/01/devops-process.png">
+<img width="800" height="450" src="https://marvel-b1-cdn.bc0a.com/f00000000236551/dt-cdn.net/wp-content/uploads/2021/07/13429_ILL_DevOpsLoop.png">
 </p>
 
 ## **ℹ️ About**
@@ -27,7 +27,7 @@ Following a push to a Whanos-compatible repository, it will perform the followin
 
 ### ⚠️ MUST
 ```
-n order for a repository to be usable within the Whanos infrastructure, it must contain a single
+In order for a repository to be usable within the Whanos infrastructure, it must contain a single
 application (written in a supported language), whose source code and resources are in an app
 directory placed at the root of the repository
 ```
@@ -54,9 +54,7 @@ Supported languages are:
 
 ## **🎮 How to Use:**
 
-1. Check the script to deploy jenkins instance
-2. Connect to the jenkins instance
-3. Accept the 
+1. [CF: How to start ](./Jenkins/JenkinsDeployment-guide.md)
 
 ## **👐 Contribute:**
 
